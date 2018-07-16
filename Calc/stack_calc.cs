@@ -8,11 +8,15 @@ namespace Calc
 {
     delegate double Func(double left, double right);
     struct MapOperation {
-        static public double Dummy(double l, double r) { return 0.0f; }
-        static private double Sum(double l, double r) { return l + r; }
-        static private double Minus(double l, double r) { return l- r; }
-        static private double Mult(double l, double r) { return l * r; }
-        static private double Div(double l, double r) { return r / l; } // обратная запись т.к. берется из стэка в другом порядке
+        static public double Dummy(double r, double l) { return 0.0f; }
+        static private double Sum(double r, double l) { return l + r; }
+        static private double Minus(double r, double l) { return l- r; }
+        static private double Mult(double r, double l) { return l * r; }
+        static private double Div(double r, double l) {
+            if (l == 0)
+                throw new DivideByZeroException();
+            return l / r;
+        } 
 
         static public Dictionary<string, Func> Map = new Dictionary<string, Func> 
         {
@@ -24,12 +28,14 @@ namespace Calc
             {"(", null},
             {")", null }
         };
+
+        static public char[] chars = { '+', '-', '*', '/', '(', ')' };
     }
     
     class Stack_calc{
         String[] mass_str;
-
-        private int checkProirity(string oper) {
+        
+        private int CheckProirity(string oper) {
             int ret = 0;
             switch (oper)
             {
@@ -46,7 +52,26 @@ namespace Calc
             return ret;
         }
 
+        private void PrepareString(ref string input) {
+
+            int index = input.IndexOfAny(MapOperation.chars);
+
+            while (index != -1 && index < input.Length) {
+                if (index != 0 && input[index - 1] != ' ') {
+                    input = input.Insert(index, " ");
+                    index++;
+                }
+                if (index != input.Length-1 && input[index + 1] != ' ') {
+                    input = input.Insert(index+1, " ");
+                    index++;
+                }
+                index = input.IndexOfAny(MapOperation.chars,index+1);
+            }
+            input = input.Replace('.', ',');
+        }
+
         public Stack_calc(string _input) {
+            PrepareString(ref _input);
             mass_str = _input.Split().Where(s => s != String.Empty).ToArray<string>();
         }
 
@@ -85,7 +110,7 @@ namespace Calc
                             wait_bracket = false;
                             st_oper.Pop();
                         }
-                        else if (checkProirity(str) > checkProirity(st_oper.First()))
+                        else if (CheckProirity(str) > CheckProirity(st_oper.First()))
                         {
                             st_oper.Push(str);
                         }
