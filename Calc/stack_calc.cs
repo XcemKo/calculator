@@ -13,7 +13,7 @@ namespace Calc
         static private double Minus(double r, double l) { return l- r; }
         static private double Mult(double r, double l) { return l * r; }
         static private double Div(double r, double l) {
-            if (l == 0)
+            if (r == 0)
                 throw new DivideByZeroException();
             return l / r;
         } 
@@ -34,7 +34,9 @@ namespace Calc
     
     class Stack_calc{
         String[] mass_str;
-        
+
+        public bool Error { get; set; } = false;
+
         private int CheckProirity(string oper) {
             int ret = 0;
             switch (oper)
@@ -132,7 +134,7 @@ namespace Calc
                 outStack += st_oper.Pop() + " ";
                 size--;
             }
-            Console.WriteLine(outStack);
+            //Console.WriteLine(outStack);
             return outStack.Trim(); ;
         }
 
@@ -144,10 +146,11 @@ namespace Calc
                 mass_str = ConvertToPolish().Split();
             }
             catch (Exception e) {
-                Console.WriteLine("{0} - ошибка",e.Message);
-                return 0.0f;
+               Console.WriteLine("{0} - ошибка",e.Message);
+               Error = true;
+               return 0.0f;
             }
-            
+
             for (int i=0;i< mass_str.Length;i++)
             {
                 double num;
@@ -161,8 +164,10 @@ namespace Calc
                     {
                         st.Push(MapOperation.Map[arg](st.Pop(), st.Pop()));
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         Console.WriteLine("{0} - ошибка", e.Message);
+                        Error = true;
                         return 0.0f;
                     }
                 }

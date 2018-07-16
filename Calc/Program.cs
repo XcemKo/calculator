@@ -11,29 +11,22 @@ namespace Calc
         static void Main(string[] args)
         {
 
-            Console.WriteLine("КАЛЬКУЛЯТОР");
-            Console.WriteLine("Пожалуйста, введите числа и операторы через пробел. Разделитель дробной части \",\"");
-            double a = 2;
-            double b = 0;
-            double c = -1;
-            try
-            {
-                c = a / b;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return;
-            }
-            Console.WriteLine(c);
+            Console.WriteLine("КАЛЬКУЛЯТОР\t Поддерживаются: + - * / ( )\tДля выхода введите \"exit\"");
+            Console.Write("Введите выражение: ");
             string input = Console.ReadLine();
+            double result = 0.0f;
             do
             {   
                 Stack_calc st = new Stack_calc(input.Trim());
-                Console.WriteLine("Результат: {0}",st.CalcPolNot());
+                result = st.CalcPolNot();
+                if (st.Error == false)
+                    Console.WriteLine("Результат: {0}", result);
+                else {
+                    st.Error = false;
+                }
                 input = Console.ReadLine();
             } while (input != "exit") ;
-
+            Console.WriteLine("До свидания!");
 
         }
     }
